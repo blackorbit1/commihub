@@ -1,34 +1,21 @@
 require('dotenv').config();
-const mongoose = require('mongoose');
-const Commission = require('./models/Commission');
-const CommissionElement = require('./models/CommissionElement');
+const { Commission, User, initializeDatabase } = require('./models');
 
 async function seedData() {
-  await mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+  await initializeDatabase();
 
-  await Commission.deleteMany({});
-  await CommissionElement.deleteMany({});
-
-  // Example of nested nodes
-  const node1 = await CommissionElement.create({ name: 'Rexouium', type: 'avatarBase', price: 10 });
-  const node2 = await CommissionElement.create({ name: 'Nardo', type: 'avatarBase', price: 10 });
-  const textureElement = await CommissionElement.create({
-    name: 'Texture',
-    type: 'texture',
-    children: [node1._id, node2._id],
+  const user = await User.create({
+    discordId: '123456',
+    username: 'SampleUser',
+    email: 'sampleuser@example.com',
   });
 
-  const commission = new Commission({
-    title: 'Sample VRChat Avatar Commission',
-    description: 'A basic example of a VRChat avatar commission.',
-    progress: 20,
-    elements: [textureElement._id],
-  });
-
-  await commission.save();
+  await Commission.bulkCreate([
+    { title: 'Sample Commission 1', description: 'Description 1', progress: 0, userId: user.id },
+    { title: 'Sample Commission 2', description: 'Description 2', progress: 50, userId: user.id },
+  ]);
 
   console.log('Sample data seeded.');
-  await mongoose.disconnect();
 }
 
 seedData().catch((err) => console.error(err));

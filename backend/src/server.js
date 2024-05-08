@@ -1,41 +1,35 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const mongoose = require('mongoose');
-const { ApolloServer } = require('apollo-server-express');
 const passport = require('passport');
 const session = require('express-session');
-const jwt = require('jsonwebtoken');
-const { typeDefs, resolvers } = require('./graphql/schema');
+const { initializeDatabase } = require('./models');
 require('./auth/discord');
+const commissionRouter = require('./routes/commissionRouter');
+const authRouter = require('./routes/authRouter');
 
 const PORT = process.env.PORT || 4000;
 
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 app.use(express.json());
-app.use(session({ secret: process.env.JWT_SECRET, resave: false, saveUninitialized: false }));
+app.use(
+  session({
+    secret: process.env.JWT_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 app.use(passport.initialize());
 app.use(passport.session());
 
-// GraphQL Setup
-const server = new ApolloServer({ typeDefs, resolvers });
-async function startServer() {
-  await server.start();
-  server.applyMiddleware({ app, path: '/graphql' });
-}
-startServer();
+// Routes
+app.use('/api/commissions', commissionRouter);
+app.use('/auth', authRouter);
 
-// Authentication Routes
-app.get('/auth/discord', passport.authenticate('discord'));
-app.get('/auth/discord/callback', passport.authenticate('discord', { failureRedirect: '/' }), (req, res) => {
-  const token = jwt.sign({ user: req.user }, process.env.JWT_SECRET);
-  res.redirect(`http://localhost:3000/login?token=${token}`);
+// Initialize Database and Start Server
+initializeDatabase().then(() => {
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 });
-
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => app.listen(PORT, () => console.log(`Server running on port ${PORT}`)))
-  .catch(err => console.error(err));

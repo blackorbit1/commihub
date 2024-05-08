@@ -12,7 +12,7 @@ services:
       - ./backend:/usr/src/app
       - /usr/src/app/node_modules
     depends_on:
-      - mongo
+      - postgres
     command: sh -c "npm start"
 
   frontend:
@@ -29,14 +29,18 @@ services:
       - backend
     command: sh -c "npm start"
 
-  mongo:
-    image: mongo
-    container_name: mongo
+  postgres:
+    image: postgres
+    container_name: postgres
     restart: always
     ports:
-      - "27017:27017"
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: commissiondb
+      POSTGRES_USER: commissionuser
+      POSTGRES_PASSWORD: password
     volumes:
-      - mongo-data:/data/db
+      - pgdata:/var/lib/postgresql/data
 
 volumes:
-  mongo-data:
+  pgdata:

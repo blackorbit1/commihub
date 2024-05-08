@@ -1,6 +1,6 @@
 const passport = require('passport');
 const DiscordStrategy = require('passport-discord').Strategy;
-const User = require('../models/User');
+const { User } = require('../models');
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -8,7 +8,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
   try {
-    const user = await User.findById(id);
+    const user = await User.findByPk(id);
     done(null, user);
   } catch (err) {
     done(err, null);
@@ -24,11 +24,16 @@ passport.use(
       scope: ['identify', 'email'],
     },
     async (accessToken, refreshToken, profile, done) => {
-      const { id, username, email } = profile;
+      const { id, username, email, avatar } = profile;
       try {
-        let user = await User.findOne({ discordId: id });
+        let user = await User.findOne({ where: { discordId: id } });
         if (!user) {
-          user = await User.create({ discordId: id, username, email });
+          user = await User.create({ discordId: id, username, email, avatar });
+        } else {
+          user.username = username;
+          user.email = email;
+          user.avatar = avatar;
+          await user.save();
         }
         done(null, user);
       } catch (err) {

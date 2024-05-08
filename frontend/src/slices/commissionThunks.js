@@ -7,60 +7,18 @@ import {
   setLoading,
   setError,
 } from './commissionSlice';
-import { gql, ApolloClient, InMemoryCache } from '@apollo/client';
+import axios from 'axios';
 
-// Initialize Apollo Client
-const client = new ApolloClient({
-  uri: process.env.REACT_APP_GRAPHQL_ENDPOINT,
-  cache: new InMemoryCache(),
+const api = axios.create({
+  baseURL: 'http://localhost:4000/api',
 });
-
-// GraphQL Queries & Mutations
-const GET_COMMISSIONS = gql`
-  query {
-    commissions {
-      id
-      title
-      description
-      progress
-    }
-  }
-`;
-
-const ADD_COMMISSION = gql`
-  mutation ($title: String!, $description: String!) {
-    addCommission(title: $title, description: $description) {
-      id
-      title
-      description
-      progress
-    }
-  }
-`;
-
-const UPDATE_COMMISSION = gql`
-  mutation ($id: ID!, $progress: Int!) {
-    updateCommission(id: $id, progress: $progress) {
-      id
-      title
-      description
-      progress
-    }
-  }
-`;
-
-const DELETE_COMMISSION = gql`
-  mutation ($id: ID!) {
-    deleteCommission(id: $id)
-  }
-`;
 
 // Thunks
 export const fetchCommissions = createAsyncThunk('commission/fetchCommissions', async (_, { dispatch }) => {
   dispatch(setLoading(true));
   try {
-    const { data } = await client.query({ query: GET_COMMISSIONS });
-    dispatch(setCommissions(data.commissions));
+    const { data } = await api.get('/commissions');
+    dispatch(setCommissions(data));
   } catch (error) {
     dispatch(setError(error.message));
   } finally {
@@ -71,8 +29,8 @@ export const fetchCommissions = createAsyncThunk('commission/fetchCommissions', 
 export const createCommission = createAsyncThunk('commission/createCommission', async ({ title, description }, { dispatch }) => {
   dispatch(setLoading(true));
   try {
-    const { data } = await client.mutate({ mutation: ADD_COMMISSION, variables: { title, description } });
-    dispatch(addCommission(data.addCommission));
+    const { data } = await api.post('/commissions', { title, description });
+    dispatch(addCommission(data));
   } catch (error) {
     dispatch(setError(error.message));
   } finally {
@@ -83,8 +41,8 @@ export const createCommission = createAsyncThunk('commission/createCommission', 
 export const updateCommission = createAsyncThunk('commission/updateCommission', async ({ id, progress }, { dispatch }) => {
   dispatch(setLoading(true));
   try {
-    const { data } = await client.mutate({ mutation: UPDATE_COMMISSION, variables: { id, progress } });
-    dispatch(updateCommissionAction(data.updateCommission));
+    const { data } = await api.put(`/commissions/${id}`, { progress });
+    dispatch(updateCommissionAction(data));
   } catch (error) {
     dispatch(setError(error.message));
   } finally {
@@ -95,7 +53,7 @@ export const updateCommission = createAsyncThunk('commission/updateCommission', 
 export const deleteCommission = createAsyncThunk('commission/deleteCommission', async (id, { dispatch }) => {
   dispatch(setLoading(true));
   try {
-    await client.mutate({ mutation: DELETE_COMMISSION, variables: { id } });
+    await api.delete(`/commissions/${id}`);
     dispatch(deleteCommissionAction(id));
   } catch (error) {
     dispatch(setError(error.message));

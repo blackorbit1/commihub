@@ -1,17 +1,17 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Spinner } from '@nextui-org/react';
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Spinner } from "@nextui-org/react";
 
 function Login() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = new URLSearchParams(window.location.search).get('token');
+    const token = new URLSearchParams(window.location.search).get("token");
     if (token) {
-      localStorage.setItem('jwt', token);
-      navigate('/dashboard');
+      localStorage.setItem("jwt", token);
+      navigate("/dashboard");
     } else {
-      navigate('/');
+      navigate("/");
     }
   }, [navigate]);
 
