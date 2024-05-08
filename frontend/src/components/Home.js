@@ -1,14 +1,34 @@
 import React from 'react';
-import { Button, Card, Text } from '@nextui-org/react';
+import { CircularProgress, Button, Card, Text, CardBody, CardFooter, Chip } from '@nextui-org/react';
 
 function Home() {
   return (
-    <Card className="p-6">
-      <Text h1 className="mb-4">Welcome to the Commission Tracking App</Text>
-      <Button href={process.env.REACT_APP_DISCORD_LOGIN_URL} variant="shadow" size="lg">
-        Login with Discord
-      </Button>
-    </Card>
+    <Card className="w-[240px] h-[240px] border-none bg-gradient-to-br from-violet-500 to-fuchsia-500">
+          <CardBody className="justify-center items-center pb-0">
+            <CircularProgress
+              classNames={{
+                svg: "w-36 h-36 drop-shadow-md",
+                indicator: "stroke-white",
+                track: "stroke-white/10",
+                value: "text-3xl font-semibold text-white",
+              }}
+              value={70}
+              strokeWidth={4}
+              showValueLabel={true}
+            />
+          </CardBody>
+          <CardFooter className="justify-center items-center pt-0">
+            <Chip
+              classNames={{
+                base: "border-1 border-white/30",
+                content: "text-white/90 text-small font-semibold",
+              }}
+              variant="bordered"
+            >
+              2800 Data points
+            </Chip>
+          </CardFooter>
+        </Card>
   );
 }
 
