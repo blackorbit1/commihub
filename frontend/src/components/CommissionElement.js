@@ -25,7 +25,7 @@ const CommissionElement = ({ element, isSelected, onChange }) => {
         />
         <div className='flex flex-col items-end gap-1'>
           <Chip color='success' size='sm' variant='flat'>
-            {`${element.price}€`}
+            {element.price > 0 ? `${element.price}€` : 'Free'}
           </Chip>
         </div>
       </div>

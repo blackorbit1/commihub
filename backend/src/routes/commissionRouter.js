@@ -38,8 +38,7 @@ router.get('/elements/:commissionerId', async (req, res) => {
   try {
     const elements = await CommissionElement.findAll({
       where: {
-        commissionerId,
-        parentsId: [],
+        commissionerId
       },
     });
     res.json(elements);

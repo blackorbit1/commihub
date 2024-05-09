@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { User } from '@nextui-org/react';
 import CommissionElement from '../components/CommissionElement';
+import AccordionElement from '../components/AccordionElement';
 import CustomButton from '../components/CustomButton';
 
 const CommissionPage = () => {
@@ -44,11 +45,47 @@ const CommissionPage = () => {
     );
   };
 
-  const calculateTotalPrice = () => {
+  const handleChildrenChange = (parentId, childrenIds) => {
+    setSelectedElements((prevSelected) => {
+      const withoutParentChildren = prevSelected.filter(
+        (id) => !elements
+          .filter((el) => el.parentsId.includes(parentId))
+          .some((child) => child.id === id),
+      );
+      return [...withoutParentChildren, ...childrenIds];
+    });
+  };
+
+  const calculateTotalPrice = (parentId = null) => {
+    if (parentId) {
+      const parentElement = elements.find((el) => el.id === parentId);
+      const childrenIds = parentElement.childrensId;
+      return (
+        parentElement.price +
+        selectedElements
+          .filter((id) => childrenIds.includes(id))
+          .reduce((total, id) => {
+            const child = elements.find((el) => el.id === id);
+            return total + (child ? child.price : 0);
+          }, 0)
+      );
+    }
     return selectedElements.reduce((total, elementId) => {
       const element = elements.find((el) => el.id === elementId);
       return total + (element ? element.price : 0);
     }, 0);
+  };
+
+  const getChildrenElements = (parentId) => {
+    return elements.filter((el) => el.parentsId.includes(parentId));
+  };
+
+  const getParentElements = () => {
+    return elements.filter((el) => el.childrensId && el.childrensId.length > 0);
+  };
+
+  const getSingleElements = () => {
+    return elements.filter((el) => !el.parentsId || el.parentsId.length === 0);
   };
 
   const handleOrder = () => {
@@ -64,8 +101,8 @@ const CommissionPage = () => {
         description={`Commissioner: ${commissioner.username}`}
         name={commissioner.username}
       />
-      <div className='gap-2 grid grid-cols-2 sm:grid-cols-4'>
-        {elements.map((element) => (
+      <div className='gap-4 grid'>
+        {getSingleElements().map((element) => (
           <CommissionElement
             key={element.id}
             element={element}
@@ -73,8 +110,20 @@ const CommissionPage = () => {
             onChange={() => handleElementChange(element.id)}
           />
         ))}
+        {getParentElements().map((parentElement) => (
+          <AccordionElement
+            key={parentElement.id}
+            element={parentElement}
+            childrenElements={getChildrenElements(parentElement.id)}
+            selectedElements={selectedElements.filter((id) =>
+              getChildrenElements(parentElement.id).map((el) => el.id).includes(id),
+            )}
+            onChildrenChange={(ids) => handleChildrenChange(parentElement.id, ids)}
+            calculateTotalPrice={calculateTotalPrice}
+          />
+        ))}
       </div>
-      <div className='flex flex-col items-end gap-2 mt-4'>
+      <div className='flex flex-col items-center gap-2 mt-4'>
         <b>Total Price: {calculateTotalPrice()}€</b>
         <CustomButton onPress={handleOrder} />
       </div>

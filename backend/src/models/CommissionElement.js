@@ -23,6 +23,9 @@ const CommissionElement = sequelize.define('CommissionElement', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  description: {
+    type: DataTypes.STRING,
+  },
   price: {
     type: DataTypes.FLOAT,
     allowNull: false,
@@ -35,10 +38,12 @@ const CommissionElement = sequelize.define('CommissionElement', {
   parentsId: {
     type: DataTypes.ARRAY(DataTypes.INTEGER),
     defaultValue: [],
+    allowNull: true,
   },
   childrensId: {
     type: DataTypes.ARRAY(DataTypes.INTEGER),
     defaultValue: [],
+    allowNull: true,
   },
 });
 
