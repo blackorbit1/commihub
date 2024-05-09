@@ -1,7 +1,7 @@
 @echo off
 
 REM Step 1: Stop the running container
-docker-compose down
+docker-compose frontend down
 
 REM Step 2: Remove the existing image
 docker rmi frontend

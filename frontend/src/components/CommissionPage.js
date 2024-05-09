@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { User } from '@nextui-org/react';
+import { User, Card, CardBody, Divider } from '@nextui-org/react';
 import CommissionElement from '../components/CommissionElement';
 import AccordionElement from '../components/AccordionElement';
 import CustomButton from '../components/CustomButton';
+import CustomDateRangePicker from '../components/DateRangePicker';
+import { today, getLocalTimeZone } from '@internationalized/date';
 
 const CommissionPage = () => {
   const { commissionerId } = useParams();
   const [commissioner, setCommissioner] = useState(null);
   const [elements, setElements] = useState([]);
   const [selectedElements, setSelectedElements] = useState([]);
+  const [dateRange, setDateRange] = useState({
+    start: today(getLocalTimeZone()),
+    end: today(getLocalTimeZone()).add({ days: 7 }),
+  });
 
   useEffect(() => {
     const fetchCommissioner = async () => {
@@ -48,9 +54,10 @@ const CommissionPage = () => {
   const handleChildrenChange = (parentId, childrenIds) => {
     setSelectedElements((prevSelected) => {
       const withoutParentChildren = prevSelected.filter(
-        (id) => !elements
-          .filter((el) => el.parentsId.includes(parentId))
-          .some((child) => child.id === id),
+        (id) =>
+          !elements
+            .filter((el) => el.parentsId.includes(parentId))
+            .some((child) => child.id === id),
       );
       return [...withoutParentChildren, ...childrenIds];
     });
@@ -85,12 +92,16 @@ const CommissionPage = () => {
   };
 
   const getSingleElements = () => {
-    return elements.filter((el) => !el.parentsId || el.parentsId.length === 0);
+    return elements.filter(
+      (el) => (!el.parentsId || el.parentsId.length === 0) && (!el.childrensId || el.childrensId.length === 0),
+    );
   };
 
   const handleOrder = () => {
     console.log('Order placed:', selectedElements);
   };
+
+  const allElements = [...getSingleElements(), ...getParentElements()].sort((a, b) => a.id - b.id);
 
   if (!commissioner) return null;
 
@@ -101,32 +112,41 @@ const CommissionPage = () => {
         description={`Commissioner: ${commissioner.username}`}
         name={commissioner.username}
       />
-      <div className='gap-4 grid'>
-        {getSingleElements().map((element) => (
-          <CommissionElement
-            key={element.id}
-            element={element}
-            isSelected={selectedElements.includes(element.id)}
-            onChange={() => handleElementChange(element.id)}
-          />
-        ))}
-        {getParentElements().map((parentElement) => (
-          <AccordionElement
-            key={parentElement.id}
-            element={parentElement}
-            childrenElements={getChildrenElements(parentElement.id)}
-            selectedElements={selectedElements.filter((id) =>
-              getChildrenElements(parentElement.id).map((el) => el.id).includes(id),
-            )}
-            onChildrenChange={(ids) => handleChildrenChange(parentElement.id, ids)}
-            calculateTotalPrice={calculateTotalPrice}
-          />
-        ))}
+      <Divider className='my-4' />
+      <div className='gap-2 grid grid-cols-2 sm:grid-cols-4'>
+        {allElements.map((element) => {
+          if (element.childrensId && element.childrensId.length > 0) {
+            return (
+              <AccordionElement
+                key={element.id}
+                element={element}
+                childrenElements={getChildrenElements(element.id)}
+                selectedElements={selectedElements.filter((id) =>
+                  getChildrenElements(element.id).map((el) => el.id).includes(id),
+                )}
+                onChildrenChange={(ids) => handleChildrenChange(element.id, ids)}
+                calculateTotalPrice={calculateTotalPrice}
+              />
+            );
+          } else {
+            return (
+              <CommissionElement
+                key={element.id}
+                element={element}
+                isSelected={selectedElements.includes(element.id)}
+                onChange={() => handleElementChange(element.id)}
+              />
+            );
+          }
+        })}
       </div>
-      <div className='flex flex-col items-center gap-2 mt-4'>
-        <b>Total Price: {calculateTotalPrice()}€</b>
-        <CustomButton onPress={handleOrder} />
-      </div>
+      <Card className='fixed bottom-0 left-1/2 transform -translate-x-1/2 mb-4'>
+        <CardBody className='flex flex-col items-center gap-2'>
+          <b>Total Price: {calculateTotalPrice()}€</b>
+          <CustomDateRangePicker value={dateRange} setValue={setDateRange} />
+          <CustomButton onPress={handleOrder} />
+        </CardBody>
+      </Card>
     </div>
   );
 };
