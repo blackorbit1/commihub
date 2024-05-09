@@ -42,6 +42,11 @@ const CustomNavbar = () => {
       </NavbarBrand>
       <NavbarContent justify='end'>
         <NavbarItem>
+          <Link color='foreground' href='/orders'>
+            Orders
+          </Link>
+        </NavbarItem>
+        <NavbarItem>
           <ThemeSwitch />
         </NavbarItem>
         {isAuthenticated && user ? (

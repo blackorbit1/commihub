@@ -39,6 +39,8 @@ async function seedData() {
   // Sample Commissions
   await Commission.bulkCreate([
     {
+      commissionerId: hexlight.id,
+      clientId: sampleUser.id,
       title: 'Sample Commission 1',
       description: 'Description 1',
       progress: 0,
@@ -46,8 +48,15 @@ async function seedData() {
       deadlineStart: new Date(),
       deadlineEnd: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
       deadlineImportance: 3,
+      elements: ['Gogo loco', 'Quest compatibility', 'Body types', 'Really fluffy tail'],
+      dateRange: { start: new Date(), end: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000) },
+      contact: { email: 'example@gmail.com', discord: 'example#1234' },
+      paymentMethod: ['PayPal'],
+      price: 30,
     },
     {
+      commissionerId: neonix.id,
+      clientId: sampleUser.id,
       title: 'Sample Commission 2',
       description: 'Description 2',
       progress: 50,
@@ -55,6 +64,11 @@ async function seedData() {
       deadlineStart: new Date(),
       deadlineEnd: new Date(new Date().getTime() + 14 * 24 * 60 * 60 * 1000),
       deadlineImportance: 5,
+      elements: ['Gogo loco', 'Quest compatibility', 'Body types', 'Really fluffy tail'],
+      dateRange: { start: new Date(), end: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000) },
+      contact: { email: '', discord: '' },
+      paymentMethod: ['PayPal'],
+      price: 30,
     },
   ]);
 

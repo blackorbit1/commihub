@@ -10,6 +10,7 @@ import Dashboard from './components/Dashboard';
 import CustomNavbar from './components/Navbar';
 import AccountPage from './components/AccountPage';
 import CommissionPage from './components/CommissionPage';
+import OrdersPage from './components/OrdersPage';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
               <Route path='/dashboard' element={<Dashboard />} />
               <Route path='/account' element={<AccountPage />} />
               <Route path='/commission/:commissionerId' element={<CommissionPage />} />
+              <Route path='/orders' element={<OrdersPage />} />
             </Routes>
           </Router>
         </Provider>

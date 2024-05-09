@@ -6,14 +6,18 @@ import {
   Card,
   CardBody,
   Divider,
+  Button,
+  Checkbox,
+  CheckboxGroup,
+  Input,
 } from '@nextui-org/react';
 import CommissionElement from '../components/CommissionElement';
 import AccordionElement from '../components/AccordionElement';
-import CustomButton from '../components/CustomButton';
-import CustomDateRangePicker from '../components/DateRangePicker';
+import CustomCarousel from '../components/CustomCarousel';
 import Backgrounds from '../components/Backgrounds';
 import DescriptionTextarea from '../components/DescriptionTextarea';
 import FileDropzone from '../components/FileDropzone';
+import OrderSummary from '../components/OrderSummary';
 import { today, getLocalTimeZone } from '@internationalized/date';
 
 const CommissionPage = () => {
@@ -25,6 +29,13 @@ const CommissionPage = () => {
     start: today(getLocalTimeZone()),
     end: today(getLocalTimeZone()).add({ days: 7 }),
   });
+  const [carouselIndex, setCarouselIndex] = useState(0);
+  const [contactMethods, setContactMethods] = useState([]);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [contactDetails, setContactDetails] = useState({});
+  const [paymentMethod, setPaymentMethod] = useState('');
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [isOrdering, setIsOrdering] = useState(false);
 
   useEffect(() => {
     const fetchCommissioner = async () => {
@@ -112,12 +123,102 @@ const CommissionPage = () => {
     return elements.filter((el) => el.parentsId.includes(categoryId));
   };
 
-  const handleOrder = () => {
-    console.log('Order placed:', selectedElements);
+  const handleOrderClick = async () => {
+    setIsOrdering(true);
+    const orderData = {
+      commissionerId: commissioner.id,
+      clientId: '5678', // Example clientId, replace with actual userId
+      elements: selectedElements,
+      dateRange,
+      contact: contactDetails,
+      paymentMethod,
+      price: totalPrice,
+    };
+
+    try {
+      const { data } = await axios.post('http://localhost:4000/api/commissions/order', orderData);
+      console.log('Order successful:', data);
+      setIsOrdering(false);
+      setCarouselIndex(carouselIndex + 1); // Slide to success page
+    } catch (err) {
+      console.error('Error creating order:', err);
+      setIsOrdering(false);
+    }
   };
 
-  const categories = getCategories();
   const allElements = [...getSingleElements()].sort((a, b) => a.id - b.id);
+
+  const updatePrice = () => setTotalPrice(calculateTotalPrice());
+
+  useEffect(() => updatePrice(), [selectedElements]);
+
+  const slides = [
+    <Card
+      isBlurred
+      className='transition ease-out duration-300 fixed bottom-0 left-1/2 transform -translate-x-1/2 mb-4 w-[500px] h-[400px]'
+    >
+      <CardBody className='flex flex-col items-center gap-2'>
+        <DescriptionTextarea />
+        <FileDropzone />
+        <b>Total Price: {totalPrice}€</b>
+        <Button onPress={() => setCarouselIndex(1)}>Next</Button>
+      </CardBody>
+    </Card>,
+    <Card
+      isBlurred
+      className='transition ease-out duration-300 fixed bottom-0 left-1/2 transform -translate-x-1/2 mb-4 w-[500px] h-[400px]'
+    >
+      <CardBody className='flex flex-col items-center gap-2'>
+        <CheckboxGroup
+          label='Select contact methods'
+          color='warning'
+          value={contactMethods}
+          onValueChange={setContactMethods}
+        >
+          <Checkbox value='email'>Email</Checkbox>
+          <Checkbox value='discord'>Discord</Checkbox>
+        </CheckboxGroup>
+        {contactMethods.includes('email') && (
+          <Input
+            isRequired
+            type='email'
+            label='Email'
+            className='max-w-xs'
+            onChange={(e) => setContactDetails((prev) => ({ ...prev, email: e.target.value }))}
+          />
+        )}
+        {contactMethods.includes('discord') && (
+          <Input
+            isRequired
+            label='Discord Username'
+            className='max-w-xs'
+            onChange={(e) => setContactDetails((prev) => ({ ...prev, discord: e.target.value }))}
+          />
+        )}
+        <CheckboxGroup
+          label='Select payment methods'
+          color='warning'
+          value={[paymentMethod]}
+          onValueChange={(values) => setPaymentMethod(values[0])}
+        >
+          <Checkbox value='paypal'>Paypal</Checkbox>
+          <Checkbox value='bank'>Bank Transfer</Checkbox>
+        </CheckboxGroup>
+        <Button onPress={() => setCarouselIndex(0)}>Back</Button>
+        <Button onPress={() => setCarouselIndex(2)}>Next</Button>
+      </CardBody>
+    </Card>,
+    <OrderSummary
+      commissioner={commissioner}
+      elements={selectedElements}
+      dateRange={dateRange}
+      contact={contactDetails}
+      paymentMethod={paymentMethod}
+      totalPrice={totalPrice}
+      onOrderClick={handleOrderClick}
+      isOrdering={isOrdering}
+    />,
+  ];
 
   if (!commissioner) return null;
 
@@ -134,7 +235,7 @@ const CommissionPage = () => {
           name={commissioner.username}
         />
         <Divider className='my-4' />
-        {categories.map((category) => (
+        {getCategories().map((category) => (
           <div key={category.id}>
             <User
               avatarProps={{
@@ -175,8 +276,7 @@ const CommissionPage = () => {
             <Divider className='my-4' />
           </div>
         ))}
-        <DescriptionTextarea />
-        <FileDropzone />
+        <CustomCarousel slides={slides} currentIndex={carouselIndex} onSlideChange={setCarouselIndex} />
         <div className='gap-2 grid grid-cols-2 sm:grid-cols-4'>
           {allElements.map((element) => (
             <CommissionElement
@@ -187,17 +287,6 @@ const CommissionPage = () => {
             />
           ))}
         </div>
-        <Card
-          isBlurred
-          className='fixed bottom-0 left-1/2 transform -translate-x-1/2 mb-4'
-        >
-          <CardBody className='flex flex-col items-center gap-2'>
-            <b>Total Price: {calculateTotalPrice()}€</b>
-            <CustomDateRangePicker value={dateRange} setValue={setDateRange} />
-
-            <CustomButton onPress={handleOrder} />
-          </CardBody>
-        </Card>
       </div>
     </div>
   );

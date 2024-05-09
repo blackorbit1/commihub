@@ -7,17 +7,45 @@ const Commission = sequelize.define('Commission', {
     primaryKey: true,
     autoIncrement: true,
   },
-  title: {
-    type: DataTypes.STRING,
+  commissionerId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'Users',
+      key: 'id',
+    },
+  },
+  clientId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'Users',
+      key: 'id',
+    },
+  },
+  elements: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
     allowNull: false,
   },
-  description: {
-    type: DataTypes.STRING,
+  dateRange: {
+    type: DataTypes.JSON,
+    allowNull: false,
+  },
+  contact: {
+    type: DataTypes.JSON,
+    allowNull: false,
+  },
+  paymentMethod: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
     allowNull: false,
   },
   progress: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.FLOAT,
     defaultValue: 0,
+  },
+  price: {
+    type: DataTypes.FLOAT,
+    allowNull: false,
   },
 });
 
