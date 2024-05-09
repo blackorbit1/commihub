@@ -21,6 +21,14 @@ const User = sequelize.define('User', {
   avatar: {
     type: DataTypes.STRING,
   },
+  theme: {
+    type: DataTypes.STRING,
+    defaultValue: 'dark',
+  },
+  commissioner: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
 });
 
 module.exports = User;

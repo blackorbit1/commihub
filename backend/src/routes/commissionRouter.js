@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Commission, User } = require('../models');
+const { Commission, User, CommissionElement } = require('../models');
 
 // Get all commissions
 router.get('/', async (req, res) => {
@@ -30,6 +30,22 @@ router.delete('/:id', async (req, res) => {
   const { id } = req.params;
   await Commission.destroy({ where: { id } });
   res.status(204).send();
+});
+
+// Get commission elements for a specific commissioner
+router.get('/elements/:commissionerId', async (req, res) => {
+  const { commissionerId } = req.params;
+  try {
+    const elements = await CommissionElement.findAll({
+      where: {
+        commissionerId,
+        parentsId: [],
+      },
+    });
+    res.json(elements);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;

@@ -7,6 +7,7 @@ const { initializeDatabase } = require('./models');
 require('./auth/discord');
 const commissionRouter = require('./routes/commissionRouter');
 const authRouter = require('./routes/authRouter');
+const userRouter = require('./routes/userRouter');
 
 const PORT = process.env.PORT || 4000;
 
@@ -28,6 +29,7 @@ app.use(passport.session());
 // Routes
 app.use('/api/commissions', commissionRouter);
 app.use('/auth', authRouter);
+app.use('/api/user', userRouter);
 
 // Initialize Database and Start Server
 initializeDatabase().then(() => {

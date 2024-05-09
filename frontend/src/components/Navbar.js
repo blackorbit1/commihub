@@ -1,12 +1,13 @@
-import React, { useEffect } from "react";
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button } from "@nextui-org/react";
-import { useSelector, useDispatch } from "react-redux";
-import { setUser, logout } from "../slices/authSlice";
-import axios from "axios";
-import { jwtDecode } from "jwt-decode";
-import UserProfile from "./UserProfile";
-import { AcmeLogo } from "./AcmeLogo";
-import LogoutIcon from "./icons/LogoutIcon";
+import React, { useEffect } from 'react';
+import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button } from '@nextui-org/react';
+import { useSelector, useDispatch } from 'react-redux';
+import { setUser, logout } from '../slices/authSlice';
+import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
+import UserProfile from './UserProfile';
+import { AcmeLogo } from './AcmeLogo';
+import LogoutIcon from './icons/LogoutIcon';
+import ThemeSwitch from './ThemeSwitcher';
 
 const CustomNavbar = () => {
   const dispatch = useDispatch();
@@ -17,12 +18,12 @@ const CustomNavbar = () => {
       const decoded = jwtDecode(token);
       dispatch(setUser(decoded.user));
     } catch (error) {
-      console.error("Failed to fetch user data:", error);
+      console.error('Failed to fetch user data:', error);
     }
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("jwt");
+    const token = localStorage.getItem('jwt');
     if (token) {
       fetchUser(token);
     }
@@ -35,27 +36,14 @@ const CustomNavbar = () => {
   return (
     <Navbar>
       <NavbarBrand>
-        <AcmeLogo />
-        <p className="font-bold text-inherit">Commission Tracking</p>
+        <Button as={Link} href='/'>
+          Home
+        </Button>
       </NavbarBrand>
-      <NavbarContent className="hidden sm:flex gap-4" justify="center">
+      <NavbarContent justify='end'>
         <NavbarItem>
-          <Link color="foreground" href="#">
-            Features
-          </Link>
+          <ThemeSwitch />
         </NavbarItem>
-        <NavbarItem>
-          <Link color="foreground" href="#">
-            Pricing
-          </Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Link color="foreground" href="#">
-            Integrations
-          </Link>
-        </NavbarItem>
-      </NavbarContent>
-      <NavbarContent justify="end">
         {isAuthenticated && user ? (
           <>
             <UserProfile
@@ -64,11 +52,16 @@ const CustomNavbar = () => {
               avatar={`https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png`}
             />
             <NavbarItem>
+              <Button as={Link} href='/account'>
+                Account
+              </Button>
+            </NavbarItem>
+            <NavbarItem>
               <Button
                 isIconOnly
-                color="warning"
-                variant="faded"
-                aria-label="Logout"
+                color='warning'
+                variant='faded'
+                aria-label='Logout'
                 onClick={handleLogout}
               >
                 <LogoutIcon />
@@ -79,9 +72,9 @@ const CustomNavbar = () => {
           <NavbarItem>
             <Button
               as={Link}
-              color="primary"
+              color='primary'
               href={process.env.REACT_APP_DISCORD_LOGIN_URL}
-              variant="flat"
+              variant='flat'
             >
               Login
             </Button>
