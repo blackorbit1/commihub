@@ -13,7 +13,7 @@ const CustomCheckboxGroup = ({ elements, selectedElements, onChange }) => {
       >
         {elements.map((element) => (
           <CustomCheckbox key={element.id} value={element.id} price={element.price}>
-            {element.name}
+            {element.name} {element.price}
           </CustomCheckbox>
         ))}
       </CheckboxGroup>

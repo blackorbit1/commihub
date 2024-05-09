@@ -45,6 +45,19 @@ const CommissionElement = sequelize.define('CommissionElement', {
     defaultValue: [],
     allowNull: true,
   },
+  externalPaidAsset: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
+  externalPaidAssetUrl: {
+    type: DataTypes.STRING,
+  },
+  icon: {
+    type: DataTypes.STRING,
+  },
+  backgroundImage: {
+    type: DataTypes.STRING,
+  },
 });
 
 module.exports = CommissionElement;

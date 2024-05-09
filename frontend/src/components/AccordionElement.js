@@ -25,7 +25,6 @@ const AccordionElement = ({
         aria-label={element.name}
         startContent={
           <AvatarGroup
-            isBordered
             max={3}
             total={childAvatars.length}
             renderCount={(count) => (

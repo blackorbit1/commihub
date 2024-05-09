@@ -25,7 +25,6 @@ const checkbox = tv({
 const CustomCheckbox = (props) => {
   const {
     children,
-    price,
     isSelected,
     isFocusVisible,
     getBaseProps,
@@ -33,6 +32,7 @@ const CustomCheckbox = (props) => {
     getInputProps,
   } = useCheckbox({ ...props });
 
+  const price = props.price;
   const styles = checkbox({ isSelected, isFocusVisible });
 
   return (
@@ -48,12 +48,13 @@ const CustomCheckbox = (props) => {
         color='primary'
         startContent={isSelected ? <CheckIcon className='ml-1' /> : null}
         variant='faded'
+        endContent={<Chip color='success' size='sm' variant='flat'>
+                              {price > 0 ? `+${price}€` : 'Free'}
+                            </Chip>}
         {...getLabelProps()}
       >
         {children ? children : isSelected ? 'Enabled' : 'Disabled'}
-        <Chip color='success' size='sm' variant='flat'>
-          {price > 0 ? `${price}€` : 'Free'}
-        </Chip>
+
       </Chip>
     </label>
   );
