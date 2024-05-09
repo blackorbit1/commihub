@@ -1,17 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button } from "@nextui-org/react";
+import { useSelector, useDispatch } from "react-redux";
+import { setUser, logout } from "../slices/authSlice";
 import axios from "axios";
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode } from "jwt-decode";
 import UserProfile from "./UserProfile";
 import { AcmeLogo } from "./AcmeLogo";
+import LogoutIcon from "./icons/LogoutIcon";
 
-export default function CustomNavbar() {
-  const [user, setUser] = useState(null);
+const CustomNavbar = () => {
+  const dispatch = useDispatch();
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
 
   const fetchUser = async (token) => {
     try {
       const decoded = jwtDecode(token);
-      setUser(decoded.user);
+      dispatch(setUser(decoded.user));
     } catch (error) {
       console.error("Failed to fetch user data:", error);
     }
@@ -23,6 +27,10 @@ export default function CustomNavbar() {
       fetchUser(token);
     }
   }, []);
+
+  const handleLogout = () => {
+    dispatch(logout());
+  };
 
   return (
     <Navbar>
@@ -48,12 +56,25 @@ export default function CustomNavbar() {
         </NavbarItem>
       </NavbarContent>
       <NavbarContent justify="end">
-        {user ? (
-          <UserProfile
-            username={user.username}
-            email={user.email}
-            avatar={`https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png`}
-          />
+        {isAuthenticated && user ? (
+          <>
+            <UserProfile
+              username={user.username}
+              email={user.email}
+              avatar={`https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png`}
+            />
+            <NavbarItem>
+              <Button
+                isIconOnly
+                color="warning"
+                variant="faded"
+                aria-label="Logout"
+                onClick={handleLogout}
+              >
+                <LogoutIcon />
+              </Button>
+            </NavbarItem>
+          </>
         ) : (
           <NavbarItem>
             <Button
@@ -69,4 +90,6 @@ export default function CustomNavbar() {
       </NavbarContent>
     </Navbar>
   );
-}
+};
+
+export default CustomNavbar;
