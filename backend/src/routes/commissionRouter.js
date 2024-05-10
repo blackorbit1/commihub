@@ -1,6 +1,21 @@
 const express = require('express');
-const { Commission, User, CommissionElement } = require('../models');
+const { Commission, CommissionElement, User } = require('../models');
+const multer = require('multer');
+const path = require('path');
 const router = express.Router();
+
+// Configure multer storage
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const { type } = req.params;
+    const folder = type === 'reference' ? 'references' : 'outputs';
+    cb(null, path.join(__dirname, '..', 'uploads', folder));
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}_${file.originalname}`);
+  },
+});
+const upload = multer({ storage });
 
 // Get commission elements for a specific commissioner
 router.get('/elements/:commissionerId', async (req, res) => {
@@ -67,5 +82,80 @@ router.get('/received/:commissionerId', async (req, res) => {
     res.status(500).json({ error: 'Error fetching received' });
   }
 });
+
+// Fetch commission details by ID
+router.get('/details/:commissionId', async (req, res) => {
+  try {
+    const { commissionId } = req.params;
+    const commission = await Commission.findOne({
+      where: { id: commissionId },
+      include: [
+        { model: User, as: 'Commissioner', attributes: ['id', 'username', 'discordId', 'avatar'] },
+        { model: CommissionElement, as: 'elements' },
+      ],
+    });
+    if (!commission) return res.status(404).json({ error: 'Commission not found' });
+    res.json(commission);
+  } catch (error) {
+    console.error('Error fetching commission details:', error);
+    res.status(500).json({ error: 'Error fetching commission details' });
+  }
+});
+
+router.get('/order/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await Commission.findByPk(id, {
+      include: [{ model: User, as: 'Commissioner' }, { model: CommissionElement, as: 'elements' }],
+    });
+    res.json(order);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/update', async (req, res) => {
+  const { id, price, dateRange, paymentMethod, contact, validatedElements } = req.body;
+
+  try {
+    const updatedOrder = await Commission.update(
+      { price, dateRange, paymentMethod, contact, validatedElements },
+      { where: { id } },
+    );
+    res.json(updatedOrder);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/upload/:orderId/:type', upload.array('files'), async (req, res) => {
+  const { orderId, type } = req.params;
+  const uploadedFiles = req.files.map((file) => ({
+    filename: file.filename,
+    originalname: file.originalname,
+    path: file.path,
+  }));
+
+  try {
+    const order = await Commission.findByPk(orderId);
+    if (type === 'reference') {
+      order.referenceFiles = [...order.referenceFiles, ...uploadedFiles];
+    } else if (type === 'output') {
+      order.outputFiles = [...order.outputFiles, ...uploadedFiles];
+    }
+    await order.save();
+    res.status(200).json(order);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/download/:filename', (req, res) => {
+  const { filename } = req.params;
+  const filepath = path.join(__dirname, '..', 'uploads', filename);
+  res.download(filepath);
+});
+
+
 
 module.exports = router;

@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+/* DETAILS */
+.details-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.details-section {
+  width: 45%;
+}

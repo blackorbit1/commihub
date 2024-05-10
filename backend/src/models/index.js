@@ -11,6 +11,10 @@ Commission.belongsTo(User, { foreignKey: 'commissionerId', as: 'Commissioner' })
 User.hasMany(Commission, { foreignKey: 'clientId', as: 'ClientCommissions' });
 Commission.belongsTo(User, { foreignKey: 'clientId', as: 'Client' });
 
+// Commission has many CommissionElements
+Commission.hasMany(CommissionElement, { foreignKey: 'commissionId', as: 'commissionElements' }); // Changed alias to 'commissionElements'
+CommissionElement.belongsTo(Commission, { foreignKey: 'commissionId', as: 'commission' });
+
 const initializeDatabase = async () => {
   await sequelize.sync({ force: true });
   console.log('Database synchronized');

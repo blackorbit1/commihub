@@ -41,36 +41,36 @@ async function seedData() {
     {
       commissionerId: hexlight.id,
       clientId: sampleUser.id,
-      title: 'Sample Commission 1',
-      description: 'Description 1',
-      progress: 0,
-      userId: sampleUser.id,
-      deadlineStart: new Date(),
-      deadlineEnd: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
-      deadlineImportance: 3,
-      elements: [1, 2, 3, 4],
+      elementsList: [1, 2, 3, 4], // Update to match new attribute name
       dateRange: { start: new Date(), end: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000) },
       contact: { email: 'example@gmail.com', discord: 'example#1234' },
       paymentMethod: 'PayPal',
+      progress: 0,
       price: 30,
     },
     {
       commissionerId: neonix.id,
       clientId: sampleUser.id,
-      title: 'Sample Commission 2',
-      description: 'Description 2',
-      progress: 50,
-      userId: sampleUser.id,
-      deadlineStart: new Date(),
-      deadlineEnd: new Date(new Date().getTime() + 14 * 24 * 60 * 60 * 1000),
-      deadlineImportance: 5,
-      elements: [5, 6, 7, 8],
-      dateRange: { start: new Date(), end: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000) },
-      contact: { email: '', discord: '' },
+      elementsList: [5, 6, 7, 8], // Update to match new attribute name
+      dateRange: { start: new Date(), end: new Date(new Date().getTime() + 14 * 24 * 60 * 60 * 1000) },
+      contact: { email: 'example2@gmail.com', discord: 'example2#5678' },
       paymentMethod: 'PayPal',
-      price: 30,
+      progress: 50,
+      price: 40,
     },
   ]);
+
+  // Seed Commission Elements
+  // await CommissionElement.bulkCreate([
+  //   { id: 1, name: 'Element 1', description: 'Description 1', commissionerId: hexlight.id },
+  //   { id: 2, name: 'Element 2', description: 'Description 2', commissionerId: hexlight.id },
+  //   { id: 3, name: 'Element 3', description: 'Description 3', commissionerId: hexlight.id },
+  //   { id: 4, name: 'Element 4', description: 'Description 4', commissionerId: hexlight.id },
+  //   { id: 5, name: 'Element 5', description: 'Description 5', commissionerId: turris.id },
+  //   { id: 6, name: 'Element 6', description: 'Description 6', commissionerId: turris.id },
+  //   { id: 7, name: 'Element 7', description: 'Description 7', commissionerId: turris.id },
+  //   { id: 8, name: 'Element 8', description: 'Description 8', commissionerId: turris.id },
+  // ]);
 
   // Commission Elements for hexlight
   const commissionElementsItem = await CommissionElement.bulkCreate([
