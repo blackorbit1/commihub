@@ -3,12 +3,13 @@ const Commission = require('./Commission');
 const User = require('./User');
 const CommissionElement = require('./CommissionElement');
 
-// Relationships
-User.hasMany(Commission, { foreignKey: 'userId' });
-Commission.belongsTo(User, { foreignKey: 'userId' });
+// Commissioner (User) has many Commissions
+User.hasMany(Commission, { foreignKey: 'commissionerId', as: 'Commissions' });
+Commission.belongsTo(User, { foreignKey: 'commissionerId', as: 'Commissioner' });
 
-User.hasMany(CommissionElement, { foreignKey: 'commissionerId' });
-CommissionElement.belongsTo(User, { foreignKey: 'commissionerId' });
+// Client (User) has many Commissions
+User.hasMany(Commission, { foreignKey: 'clientId', as: 'ClientCommissions' });
+Commission.belongsTo(User, { foreignKey: 'clientId', as: 'Client' });
 
 const initializeDatabase = async () => {
   await sequelize.sync({ force: true });

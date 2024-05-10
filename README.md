@@ -1,2 +1,2 @@
 # commihub
- Help commissionner
+ Help commissioner

@@ -2,11 +2,6 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 const User = sequelize.define('User', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  },
   discordId: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -17,18 +12,18 @@ const User = sequelize.define('User', {
   },
   email: {
     type: DataTypes.STRING,
+    allowNull: false,
   },
   avatar: {
     type: DataTypes.STRING,
-  },
-  theme: {
-    type: DataTypes.STRING,
-    defaultValue: 'dark',
+    allowNull: true,
   },
   commissioner: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
+}, {
+  timestamps: true,
 });
 
 module.exports = User;

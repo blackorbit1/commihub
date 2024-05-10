@@ -1,31 +1,33 @@
-import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Spinner } from "@nextui-org/react";
-import { useDispatch } from "react-redux";
-import { setUser } from "../slices/authSlice";
-import { jwtDecode } from "jwt-decode";
+import React, { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import axios from 'axios';
+import { setUser } from '../slices/authSlice';
+import { jwtDecode } from 'jwt-decode';
 
-function Login() {
-  const navigate = useNavigate();
+const Login = () => {
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    const token = new URLSearchParams(window.location.search).get("token");
-    if (token) {
-      localStorage.setItem("jwt", token);
+  const fetchUserData = async (token) => {
+    try {
       const decoded = jwtDecode(token);
       dispatch(setUser(decoded.user));
-      navigate("/dashboard");
-    } else {
-      navigate("/");
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
     }
-  }, [navigate, dispatch]);
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem('jwt');
+    if (token) {
+      fetchUserData(token);
+    }
+  }, [dispatch]);
 
   return (
-    <div className="flex justify-center items-center h-screen">
-      <Spinner size="xl" />
+    <div>
+      <a href={process.env.REACT_APP_DISCORD_LOGIN_URL}>Login with Discord</a>
     </div>
   );
-}
+};
 
 export default Login;

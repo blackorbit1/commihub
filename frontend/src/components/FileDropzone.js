@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useDropzone } from 'react-dropzone'
+import { useDropzone } from 'react-dropzone';
 import { Image } from '@nextui-org/react';
 
 const thumbsContainer = {

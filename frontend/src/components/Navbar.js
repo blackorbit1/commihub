@@ -47,6 +47,11 @@ const CustomNavbar = () => {
           </Link>
         </NavbarItem>
         <NavbarItem>
+          <Link color='foreground' href='/received'>
+            Received
+          </Link>
+        </NavbarItem>
+        <NavbarItem>
           <ThemeSwitch />
         </NavbarItem>
         {isAuthenticated && user ? (

@@ -11,6 +11,8 @@ import CustomNavbar from './components/Navbar';
 import AccountPage from './components/AccountPage';
 import CommissionPage from './components/CommissionPage';
 import OrdersPage from './components/OrdersPage';
+import ReceivedPage from './components/ReceivedPage';
+import Backgrounds from './components/Backgrounds';
 
 function App() {
   return (
@@ -19,6 +21,7 @@ function App() {
         <Provider store={store}>
           <Router>
             <CustomNavbar />
+            <Backgrounds />
             <Routes>
               <Route path='/' element={<Home />} />
               <Route path='/login' element={<Login />} />
@@ -26,6 +29,7 @@ function App() {
               <Route path='/account' element={<AccountPage />} />
               <Route path='/commission/:commissionerId' element={<CommissionPage />} />
               <Route path='/orders' element={<OrdersPage />} />
+              <Route path='/received' element={<ReceivedPage />} />
             </Routes>
           </Router>
         </Provider>
