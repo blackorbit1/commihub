@@ -105,14 +105,19 @@ router.get('/details/:commissionId', async (req, res) => {
 router.get('/order/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const order = await Commission.findByPk(id, {
-      include: [{ model: User, as: 'Commissioner' }, { model: CommissionElement, as: 'elements' }],
+    const commission = await Commission.findByPk(id, {
+      include: [
+        { model: User, as: 'Commissioner' },
+        { model: CommissionElement, as: 'elements' },
+      ],
     });
-    res.json(order);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.json(commission);
+  } catch (error) {
+    console.error('Error fetching order:', error);
+    res.status(500).json({ error: 'Error fetching order' });
   }
 });
+
 
 router.post('/update', async (req, res) => {
   const { id, price, dateRange, paymentMethod, contact, validatedElements } = req.body;

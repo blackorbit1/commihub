@@ -165,7 +165,6 @@ const OrdersPage = () => {
                 {order.price}€
               </Chip>
             </CardBody>
-
             <Divider />
             <CardFooter>
               <Button>Details</Button>

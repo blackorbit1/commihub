@@ -35,26 +35,28 @@ function EndIcon(props) {
   return <DisabledByDefaultRoundedIcon {...props} sx={{ opacity: 0.3 }} />;
 }
 
-const renderTreeItems = (elements, validatedElements = []) => {
+const renderTreeItems = (elements, validatedElements) => {
   return elements.map((element) => {
+    const children = elements.filter((el) => el.parentsId.includes(element.id));
     const isValidated = validatedElements.includes(element.id);
+
     return (
       <CustomTreeItem
         key={element.id}
         itemId={element.id.toString()}
-        label={element.name}
-        endIcon={isValidated ? null : <DisabledByDefaultRoundedIcon />}
+        label={`${isValidated ? '✓ ' : ''}${element.name}`}
+        endIcon={children.length === 0 ? <EndIcon /> : null}
       >
-        {element.childrens ? renderTreeItems(element.childrens, validatedElements) : null}
+        {children.length > 0 && renderTreeItems(children, validatedElements)}
       </CustomTreeItem>
     );
   });
 };
 
-const BorderedTreeView = ({ elements = [], validatedElements = [] }) => {
+export default function BorderedTreeView({ elements = [], validatedElements = [] }) {
   return (
     <SimpleTreeView
-      aria-label='customized'
+      aria-label='commission-elements'
       defaultExpandedItems={['1']}
       slots={{
         expandIcon: ExpandIcon,
@@ -66,6 +68,4 @@ const BorderedTreeView = ({ elements = [], validatedElements = [] }) => {
       {renderTreeItems(elements, validatedElements)}
     </SimpleTreeView>
   );
-};
-
-export default BorderedTreeView;
+}

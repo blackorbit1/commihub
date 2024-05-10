@@ -15,6 +15,14 @@ const CommissionElement = sequelize.define('CommissionElement', {
       key: 'id',
     },
   },
+  clientId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'Users',
+      key: 'id',
+    },
+  },
   type: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -23,6 +31,19 @@ const CommissionElement = sequelize.define('CommissionElement', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+
+  dateRange: {
+    type: DataTypes.JSON,
+    allowNull: false,
+  },
+  contact: {
+    type: DataTypes.JSON,
+    allowNull: false,
+  },
+  paymentMethod: {
+    type: DataTypes.STRING,
+  },
+
   description: {
     type: DataTypes.STRING,
   },

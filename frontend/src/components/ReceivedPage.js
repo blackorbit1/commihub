@@ -102,7 +102,7 @@ const ReceivedPage = () => {
           />
           <Button.Group>
             <Button onPress={() => handlePriceChange(-5)}>-5</Button>
-            <Button onPress={() to handlePriceChange(5)}>+5</Button>
+            <Button onPress={() => handlePriceChange(5)}>+5</Button>
           </Button.Group>
           <Divider orientation='horizontal' />
           <p>Payment Method: {paymentMethod}</p>
